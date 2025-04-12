@@ -63,7 +63,7 @@ namespace Client
 
             btnSend = new Button
             {
-                Text = "Отправить",
+                Text = "РћС‚РїСЂР°РІРёС‚СЊ",
                 Location = new Point(470, 220),
                 Size = new Size(100, 35),
                 BackColor = Color.FromArgb(0, 120, 215),
@@ -91,21 +91,21 @@ namespace Client
 
         private async Task TryConnectAsync()
         {
-            AppendLog("Попытка подключения к серверу...");
+            AppendLog("РџРѕРїС‹С‚РєР° РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє СЃРµСЂРІРµСЂСѓ...");
             client = new TcpClient();
             try
             {
                 await client.ConnectAsync(IPAddress.Loopback, DEFAULT_PORT);
                 stream = client.GetStream();
                 isConnected = true;
-                AppendLog("Подключение к серверу установлено.");
+                AppendLog("РџРѕРґРєР»СЋС‡РµРЅРёРµ Рє СЃРµСЂРІРµСЂСѓ СѓСЃС‚Р°РЅРѕРІР»РµРЅРѕ.");
 
                 _ = SendQueuedMessagesAsync();
                 _ = ReceiveMessagesAsync();
             }
             catch
             {
-                AppendLog("Сервер недоступен. Ожидание следующей попытки...");
+                AppendLog("РЎРµСЂРІРµСЂ РЅРµРґРѕСЃС‚СѓРїРµРЅ. РћР¶РёРґР°РЅРёРµ СЃР»РµРґСѓСЋС‰РµР№ РїРѕРїС‹С‚РєРё...");
                 client?.Close();
                 client = null;
                 stream = null;
@@ -116,13 +116,13 @@ namespace Client
         {
             if (string.IsNullOrEmpty(txtMessage.Text))
             {
-                AppendLog("Сообщение не может быть пустым.");
+                AppendLog("РЎРѕРѕР±С‰РµРЅРёРµ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РїСѓСЃС‚С‹Рј.");
                 return;
             }
 
             string message = txtMessage.Text;
             messageQueue.Enqueue(message);
-            AppendLog($"Сообщение добавлено в очередь: {message}");
+            AppendLog($"РЎРѕРѕР±С‰РµРЅРёРµ РґРѕР±Р°РІР»РµРЅРѕ РІ РѕС‡РµСЂРµРґСЊ: {message}");
             txtMessage.Clear();
 
             if (isConnected)
@@ -131,7 +131,7 @@ namespace Client
             }
             else
             {
-                AppendLog("Сервер недоступен, сообщение будет отправлено при подключении.");
+                AppendLog("РЎРµСЂРІРµСЂ РЅРµРґРѕСЃС‚СѓРїРµРЅ, СЃРѕРѕР±С‰РµРЅРёРµ Р±СѓРґРµС‚ РѕС‚РїСЂР°РІР»РµРЅРѕ РїСЂРё РїРѕРґРєР»СЋС‡РµРЅРёРё.");
             }
         }
 
@@ -143,11 +143,11 @@ namespace Client
                 {
                     byte[] messageBytes = Encoding.UTF8.GetBytes(message);
                     await stream.WriteAsync(messageBytes, 0, messageBytes.Length, cancellationTokenSource.Token);
-                    AppendLog($"Сообщение отправлено: {message}");
+                    AppendLog($"РЎРѕРѕР±С‰РµРЅРёРµ РѕС‚РїСЂР°РІР»РµРЅРѕ: {message}");
                 }
                 catch
                 {
-                    AppendLog($"Ошибка при отправке сообщения: {message}. Возвращаем в очередь.");
+                    AppendLog($"РћС€РёР±РєР° РїСЂРё РѕС‚РїСЂР°РІРєРµ СЃРѕРѕР±С‰РµРЅРёСЏ: {message}. Р’РѕР·РІСЂР°С‰Р°РµРј РІ РѕС‡РµСЂРµРґСЊ.");
                     messageQueue.Enqueue(message);
                     await DisconnectAsync();
                     break;
@@ -167,11 +167,11 @@ namespace Client
                     if (bytesReceived > 0)
                     {
                         string response = Encoding.UTF8.GetString(buffer, 0, bytesReceived);
-                        AppendLog($"Ответ от сервера: {response}");
+                        AppendLog($"РћС‚РІРµС‚ РѕС‚ СЃРµСЂРІРµСЂР°: {response}");
                     }
                     else
                     {
-                        AppendLog("Соединение с сервером прервано.");
+                        AppendLog("РЎРѕРµРґРёРЅРµРЅРёРµ СЃ СЃРµСЂРІРµСЂРѕРј РїСЂРµСЂРІР°РЅРѕ.");
                         await DisconnectAsync();
                         break;
                     }
@@ -183,7 +183,7 @@ namespace Client
             }
             catch
             {
-                AppendLog("Ошибка при получении данных от сервера.");
+                AppendLog("РћС€РёР±РєР° РїСЂРё РїРѕР»СѓС‡РµРЅРёРё РґР°РЅРЅС‹С… РѕС‚ СЃРµСЂРІРµСЂР°.");
                 await DisconnectAsync();
             }
         }
@@ -192,13 +192,13 @@ namespace Client
         {
             if (!isConnected) return;
 
-            AppendLog("Отключение от сервера...");
+            AppendLog("РћС‚РєР»СЋС‡РµРЅРёРµ РѕС‚ СЃРµСЂРІРµСЂР°...");
             isConnected = false;
             stream?.Dispose();
             client?.Close();
             stream = null;
             client = null;
-            AppendLog("Отключено. Ожидание восстановления соединения...");
+            AppendLog("РћС‚РєР»СЋС‡РµРЅРѕ. РћР¶РёРґР°РЅРёРµ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ СЃРѕРµРґРёРЅРµРЅРёСЏ...");
             await Task.CompletedTask;
         }
 
