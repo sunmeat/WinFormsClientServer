@@ -51,13 +51,13 @@ namespace Server
 
         private async void StartServerAsync()
         {
-            AppendLog("Запуск сервера...");
+            AppendLog("Р—Р°РїСѓСЃРє СЃРµСЂРІРµСЂР°...");
             try
             {
                 listener = new TcpListener(IPAddress.Any, DEFAULT_PORT);
                 listener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
                 listener.Start();
-                AppendLog("Сервер запущен. Ожидание клиентов...");
+                AppendLog("РЎРµСЂРІРµСЂ Р·Р°РїСѓС‰РµРЅ. РћР¶РёРґР°РЅРёРµ РєР»РёРµРЅС‚РѕРІ...");
 
                 _ = ProcessMessages();
 
@@ -69,7 +69,7 @@ namespace Server
                         int clientId = Interlocked.Increment(ref clientCounter);
                         var clientEndPoint = (IPEndPoint)client.Client.RemoteEndPoint;
                         clients.TryAdd(clientId, (client, clientEndPoint.Address.ToString(), clientEndPoint.Port));
-                        AppendLog($"Клиент #{clientId} подключился: IP {clientEndPoint.Address}, Порт {clientEndPoint.Port}");
+                        AppendLog($"РљР»РёРµРЅС‚ #{clientId} РїРѕРґРєР»СЋС‡РёР»СЃСЏ: IP {clientEndPoint.Address}, РџРѕСЂС‚ {clientEndPoint.Port}");
                         _ = HandleClientAsync(client, clientId);
                     }
                     catch (OperationCanceledException)
@@ -82,13 +82,13 @@ namespace Server
             }
             catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AddressAlreadyInUse)
             {
-                AppendLog("Порт 27015 уже используется.");
+                AppendLog("РџРѕСЂС‚ 27015 СѓР¶Рµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ.");
             }
             catch (Exception ex)
             {
                 if (!cancellationTokenSource.Token.IsCancellationRequested)
                 {
-                    AppendLog($"Ошибка: {ex.Message}");
+                    AppendLog($"РћС€РёР±РєР°: {ex.Message}");
                 }
             }
         }
@@ -107,11 +107,11 @@ namespace Server
                     if (bytesReceived > 0)
                     {
                         messageQueue.Enqueue((client, buffer[..bytesReceived]));
-                        AppendLog($"Клиент #{clientId}: Добавлено сообщение в очередь.");
+                        AppendLog($"РљР»РёРµРЅС‚ #{clientId}: Р”РѕР±Р°РІР»РµРЅРѕ СЃРѕРѕР±С‰РµРЅРёРµ РІ РѕС‡РµСЂРµРґСЊ.");
                     }
                     else
                     {
-                        break; // клиент отключился
+                        break; // РєР»РёРµРЅС‚ РѕС‚РєР»СЋС‡РёР»СЃСЏ
                     }
                 }
             }
@@ -120,14 +120,14 @@ namespace Server
             }
             catch (Exception ex)
             {
-                AppendLog($"Ошибка с клиентом #{clientId}: {ex.Message}");
+                AppendLog($"РћС€РёР±РєР° СЃ РєР»РёРµРЅС‚РѕРј #{clientId}: {ex.Message}");
             }
             finally
             {
                 stream?.Dispose();
                 client.Close();
                 clients.TryRemove(clientId, out _);
-                AppendLog($"Клиент #{clientId} отключился.");
+                AppendLog($"РљР»РёРµРЅС‚ #{clientId} РѕС‚РєР»СЋС‡РёР»СЃСЏ.");
             }
         }
 
@@ -145,7 +145,7 @@ namespace Server
                         string message = Encoding.UTF8.GetString(buffer);
                         var clientEndPoint = (IPEndPoint)client.Client.RemoteEndPoint;
                         int clientId = clients.FirstOrDefault(x => x.Value.ip == clientEndPoint.Address.ToString() && x.Value.port == clientEndPoint.Port).Key;
-                        AppendLog($"Клиент #{clientId} отправил сообщение: {message}");
+                        AppendLog($"РљР»РёРµРЅС‚ #{clientId} РѕС‚РїСЂР°РІРёР» СЃРѕРѕР±С‰РµРЅРёРµ: {message}");
 
                         await Task.Delay(100, cancellationTokenSource.Token).ConfigureAwait(false);
 
@@ -156,11 +156,11 @@ namespace Server
                         {
                             var stream = client.GetStream();
                             await stream.WriteAsync(responseBytes, 0, responseBytes.Length, cancellationTokenSource.Token).ConfigureAwait(false);
-                            AppendLog($"Ответ клиенту #{clientId}: {response}");
+                            AppendLog($"РћС‚РІРµС‚ РєР»РёРµРЅС‚Сѓ #{clientId}: {response}");
                         }
                         catch
                         {
-                            AppendLog($"Не удалось отправить сообщение клиенту #{clientId}.");
+                            AppendLog($"РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РїСЂР°РІРёС‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ РєР»РёРµРЅС‚Сѓ #{clientId}.");
                         }
                     }
                     await Task.Delay(15, cancellationTokenSource.Token).ConfigureAwait(false);
@@ -171,7 +171,7 @@ namespace Server
                 }
                 catch (Exception ex)
                 {
-                    AppendLog($"Ошибка в ProcessMessages: {ex.Message}");
+                    AppendLog($"РћС€РёР±РєР° РІ ProcessMessages: {ex.Message}");
                 }
             }
         }
@@ -188,11 +188,11 @@ namespace Server
                     {
                         clientInfo.client.Close();
                         clientInfo.client.Dispose();
-                        AppendLog($"Клиент с IP {clientInfo.ip}:{clientInfo.port} закрыт.");
+                        AppendLog($"РљР»РёРµРЅС‚ СЃ IP {clientInfo.ip}:{clientInfo.port} Р·Р°РєСЂС‹С‚.");
                     }
                     catch (Exception ex)
                     {
-                        AppendLog($"Ошибка при закрытии клиента {clientInfo.ip}:{clientInfo.port}: {ex.Message}");
+                        AppendLog($"РћС€РёР±РєР° РїСЂРё Р·Р°РєСЂС‹С‚РёРё РєР»РёРµРЅС‚Р° {clientInfo.ip}:{clientInfo.port}: {ex.Message}");
                     }
                 }
                 clients.Clear();
@@ -200,11 +200,11 @@ namespace Server
                 listener?.Stop();
                 listener = null;
 
-                AppendLog("Сервер полностью остановлен.");
+                AppendLog("РЎРµСЂРІРµСЂ РїРѕР»РЅРѕСЃС‚СЊСЋ РѕСЃС‚Р°РЅРѕРІР»РµРЅ.");
             }
             catch (Exception ex)
             {
-                AppendLog($"Ошибка при остановке сервера: {ex.Message}");
+                AppendLog($"РћС€РёР±РєР° РїСЂРё РѕСЃС‚Р°РЅРѕРІРєРµ СЃРµСЂРІРµСЂР°: {ex.Message}");
             }
             finally
             {
@@ -227,7 +227,7 @@ namespace Server
         protected override async void OnFormClosing(FormClosingEventArgs e)
         {
             base.OnFormClosing(e);
-            AppendLog("Закрытие сервера...");
+            AppendLog("Р—Р°РєСЂС‹С‚РёРµ СЃРµСЂРІРµСЂР°...");
             await StopServerAsync();
             cancellationTokenSource.Dispose();
         }
